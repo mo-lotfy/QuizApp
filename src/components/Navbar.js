@@ -15,10 +15,6 @@ function NavbarComponent(props) {
     <>
       <Navbar color="dark" dark expand="xl">
         <NavbarBrand to="/" tag={Link}>Quizapp</NavbarBrand>
-        <NavbarToggler onClick={function noRefCheck() {}} />
-        <Collapse navbar>
-          <Button to="/create" tag={Link}>Create Quiz</Button>
-        </Collapse>
       </Navbar>
     </>
   );

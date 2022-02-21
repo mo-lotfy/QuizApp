@@ -12,7 +12,7 @@ function simpleUniqueId() {
   return [gen(), gen(), gen()].join("");
 }
 
-function UpdateQuizData(props) {
+function UpdateQuestion(props) {
   const {
     quiz: { quizzes },
     createQuiz,
@@ -20,21 +20,28 @@ function UpdateQuizData(props) {
   let params = useParams();
 
   const QuizInfo = quizzes?.find((q) => q?.id === params?.id);
-  const [title, setTitle] = useState(QuizInfo?.title);
-  const [desc, setDesc] = useState(QuizInfo?.desc);
-  const [url, setUrl] = useState(QuizInfo?.url);
+  const QuestionInfo = QuizInfo?.questions?.find((q) => q?.id === params?.qid);
+
+  const [title, setTitle] = useState(QuestionInfo?.title);
+  const [successFeedback, setSuccessFeedback] = useState(QuestionInfo?.successFeedback);
+  const [failureFeedback, setFailureFeedback] = useState(QuestionInfo?.failureFeedback);
   const navigate = useNavigate();
 
   const onSubmit = (e) => {
     e.preventDefault();
     createQuiz([
-      ...quizzes.filter((quiz) => quiz?.id !== QuizInfo?.id),
+      ...quizzes?.filter((quiz) => quiz?.id !== QuizInfo?.id),
       {
         ...QuizInfo,
-        title,
-        desc,
-        url,
-        modified: new Date(),
+        questions: [
+          ...QuizInfo.questions?.filter((question) => question?.id !== params?.qid),
+          {
+            ...QuizInfo?.questions?.find((q) => q?.id === params?.qid),
+            title,
+            successFeedback,
+            failureFeedback,
+          },
+        ],
       },
     ]);
     navigate(`/quiz/${QuizInfo.id}`);
@@ -55,6 +62,18 @@ function UpdateQuizData(props) {
                 </CardBody>
               </Card>
             );
+          } else if (QuestionInfo === undefined) {
+            return (
+              <Card className="mt-5">
+                <CardBody>
+                  <CardText>Question doesn't exist</CardText>
+
+                  <Button className="ml-2 d-inline" size="sm" to={`/quiz/${QuizInfo?.id}`} tag={Link}>
+                    Discover Quiz Questions
+                  </Button>
+                </CardBody>
+              </Card>
+            );
           } else {
             return (
               <>
@@ -62,22 +81,21 @@ function UpdateQuizData(props) {
                   <BreadcrumbItem>
                     <Link to="/">Quiz</Link>
                   </BreadcrumbItem>
-                  <BreadcrumbItem active>Update {QuizInfo?.title}</BreadcrumbItem>
+                  <BreadcrumbItem active>Update {QuestionInfo?.title}</BreadcrumbItem>
                 </Breadcrumb>
-                <small className="text-muted d-block">Created at: {QuizInfo?.created?.toLocaleDateString()}</small>
-                <h1 className="border-bottom pb-2 d-flex justify-content-between align-items-center">Update: {QuizInfo?.title}</h1>
+                <h1 className="border-bottom pb-2 d-flex justify-content-between align-items-center">Update: {QuestionInfo?.title}</h1>
                 <Form onSubmit={(e) => onSubmit(e)}>
                   <FormGroup>
-                    <Label for="title">Quiz Title</Label>
-                    <Input id="title" name="title" required placeholder="Write quiz title" type="text" onChange={(e) => setTitle(e.target.value)} value={title} />
+                    <Label for="title">Questions Title</Label>
+                    <Input id="title" name="title" required placeholder="Write question title" type="text" onChange={(e) => setTitle(e.target.value)} value={title} />
                   </FormGroup>
                   <FormGroup>
-                    <Label for="description">Quiz Description</Label>
-                    <Input id="description" name="description" required placeholder="Write quiz description" type="text" onChange={(e) => setDesc(e.target.value)} value={desc} />
+                    <Label for="description">Success Feedback</Label>
+                    <Input id="description" name="description" required placeholder="Write question description" type="text" onChange={(e) => setSuccessFeedback(e.target.value)} value={successFeedback} />
                   </FormGroup>
                   <FormGroup>
-                    <Label for="url">Quiz URL</Label>
-                    <Input id="url" name="url" placeholder="Write quiz URL" type="text" onChange={(e) => setUrl(e.target.value)} value={url} />
+                    <Label for="description">Failure Feedback</Label>
+                    <Input id="description" name="description" required placeholder="Write question description" type="text" onChange={(e) => setFailureFeedback(e.target.value)} value={failureFeedback} />
                   </FormGroup>
                   <Button>Update</Button>
                   {(() => {
@@ -95,4 +113,4 @@ function UpdateQuizData(props) {
   );
 }
 
-export default connect((state) => state, { createQuiz })(UpdateQuizData);
+export default connect((state) => state, { createQuiz })(UpdateQuestion);

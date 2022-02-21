@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect } from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import { Container, CardDeck, Card, CardBody, CardTitle, CardSubtitle, CardText, Button, Row, Col } from "reactstrap";
+import { Container, CardDeck, Card, CardBody, CardTitle, CardSubtitle, CardText, Button, Row, Col, Progress } from "reactstrap";
 
 function Home(props) {
   const {
@@ -11,7 +11,12 @@ function Home(props) {
   return (
     <>
       <Container>
-        <h1 className="border-bottom pb-2 mt-4">Quizzes</h1>
+        <h1 className="border-bottom pb-2 mt-4 d-flex justify-content-between align-items-center">
+          Quizzes
+          <Button to="/create" tag={Link}>
+            Create Quiz
+          </Button>
+        </h1>
         <CardDeck tag={Row}>
           {(() => {
             if (quizzes?.length === 0) {
@@ -40,7 +45,14 @@ function Home(props) {
                         );
                       }
                     })()}
-                    <Button block>Start</Button>
+                    <Button tag={Link} to={`/quiz/${quiz?.id}/questions`} block>
+                      Start
+                    </Button>
+                    {(() => {
+                      if (quiz?.score !== null) {
+                        return <Progress animated color="success" striped value={quiz?.score} />;
+                      }
+                    })()}
                   </CardBody>
                 </Card>
               ));
